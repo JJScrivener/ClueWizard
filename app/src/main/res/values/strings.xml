@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">ClueWizard</string>
+
+    <!--Main activity variables-->
+    <string name="main_btn_new">NEW</string>
+    <string name="main_btn_load">LOAD</string>
+    <string name="main_btn_settings">SETTINGS</string>
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+
+</resources>
