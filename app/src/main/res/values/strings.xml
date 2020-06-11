@@ -5,9 +5,52 @@
     <string name="main_btn_new">NEW</string>
     <string name="main_btn_load">LOAD</string>
     <string name="main_btn_settings">SETTINGS</string>
-    <string name="title_activity_fullscreen">FullscreenActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <!--Game activity variables-->
+    <string name="suspects_title">SUSPECTS</string>
+    <string name="weapons_title">WEAPONS</string>
+    <string name="rooms_title">ROOMS</string>
+    <string name="owner_title">OWNER</string>
+
+    <string name="mustard_txt">Colonel Mustard</string>
+    <string name="plumb_txt">Professor Plumb</string>
+    <string name="green_txt">Mr Green</string>
+    <string name="peacock_txt">Mrs Peacock</string>
+    <string name="scarlet_txt">Miss Scarlet</string>
+    <string name="white_txt">Mrs White</string>
+
+    <string name="knife_txt">Knife</string>
+    <string name="candlestick_txt">Candlestick</string>
+    <string name="revolver_txt">Revolver</string>
+    <string name="rope_txt">Rope</string>
+    <string name="lead_pipe_txt">Lead Pipe</string>
+    <string name="wrench_txt">Wrench</string>
+
+    <string name="hall_txt">Hall</string>
+    <string name="lounge_txt">Lounge</string>
+    <string name="dining_room_txt">Dining Room</string>
+    <string name="kitchen_txt">Kitchen</string>
+    <string name="ballroom_txt">Ballroom</string>
+    <string name="conservatory_txt">Conservatory</string>
+    <string name="billiard_room_txt">Billiard Room</string>
+    <string name="library_txt">Library</string>
+    <string name="study_txt">Study</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
 
 </resources>

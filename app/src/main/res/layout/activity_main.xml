@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/mainBtnNew"
+        android:id="@+id/main_btn_new"
         android:layout_width="@dimen/main_btn_width"
         android:layout_height="wrap_content"
         android:text="@string/main_btn_new"
@@ -17,30 +17,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.3" />
 
-    <Button
-        android:id="@+id/mainBtnLoad"
-        android:layout_width="@dimen/main_btn_width"
-        android:layout_height="wrap_content"
-        android:text="@string/main_btn_load"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.4" />
-
-    <Button
-        android:id="@+id/mainBtnSettings"
-        android:layout_width="@dimen/main_btn_width"
-        android:layout_height="wrap_content"
-        android:text="@string/main_btn_settings"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.8" />
-
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/background_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
@@ -48,6 +26,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/background"/>
+        android:background="@null"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
