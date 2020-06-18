@@ -3,5 +3,9 @@
     <dimen name="main_btn_width">200dp</dimen>
     
     <dimen name="margin_top">10dp</dimen>
+    <dimen name="row_top_space">6dp</dimen>
+    <dimen name="row_side_space">5dp</dimen>
+    <dimen name="title_space">10dp</dimen>
     <dimen name="title_text">20sp</dimen>
+    <dimen name="comment_padding">4dp</dimen>
 </resources>

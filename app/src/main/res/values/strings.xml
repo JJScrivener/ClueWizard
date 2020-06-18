@@ -3,7 +3,7 @@
 
     <!--Button names-->
     <string name="main_btn_new">NEW</string>
-    <string name="game_btn">Press Me Please</string>
+    <string name="game_btn">Question</string>
 
     <!--Categories-->
     <string-array name="categories">
@@ -42,6 +42,13 @@
         <item>Library</item>
         <item>Study</item>
     </string-array>
+
+    <!--Question parameters-->
+    <string name="question_asker">Who asked the question?</string>
+    <string name="question_answerer">Who answered the question?</string>
+    <string name="question_suspect">Who was the suspect?</string>
+    <string name="question_weapon">What was the weapon?</string>
+    <string name="question_room">Which room was it in?</string>
 
 
 </resources>

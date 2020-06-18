@@ -3,30 +3,33 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/item_row"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/row_top_space">
 
     <TextView
         android:id="@+id/label"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"/>
-
-    <CheckBox
-        android:id="@+id/player1_box"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="" />
+        android:textAlignment="viewEnd"
+        android:layout_marginLeft="@dimen/row_side_space"/>
 
-    <CheckBox
-        android:id="@+id/player2_box"
+
+    <LinearLayout
+        android:id="@+id/boxes_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="" />
+        android:layout_height="match_parent"
+        android:orientation="horizontal"/>
 
     <TextView
         android:id="@+id/comment"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:background="@color/comment_background"
+        android:textColor="@color/comment_text"
+        android:paddingStart="@dimen/comment_padding"
+        android:paddingEnd="@dimen/comment_padding"
+        android:layout_marginLeft="@dimen/row_side_space"
+        android:layout_marginRight="@dimen/row_side_space"/>
 
 </LinearLayout>

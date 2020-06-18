@@ -1,10 +1,12 @@
 package scrivener.cluewizard
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 
 
@@ -21,11 +23,28 @@ class MainActivity : AppCompatActivity() {
         }
 
         val mainBtnNew = findViewById<Button>(R.id.main_btn_new)
-        mainBtnNew?.setOnClickListener {startActivity<GameActivity>()}
+        mainBtnNew.setOnClickListener {startNewGame()}
 
     }
 
+    private fun startNewGame(){
+        val input = EditText(this)
+        val dialog: AlertDialog = AlertDialog.Builder(this)
+            .setTitle("How many players?")
+            .setView(input)
+            .setPositiveButton("Go"
+            ) { _, _ ->
+                val intent = Intent(this,GameActivity::class.java)
+                intent.putExtra("players",input.text.toString().toInt())
+                startActivity(intent)
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+        dialog.show()
 
+
+
+    }
     private inline fun <reified T: Activity> Activity.startActivity() {
         startActivity(Intent(this, T::class.java))
     }

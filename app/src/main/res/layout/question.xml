@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/question_asker_lab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/question_asker" />
+
+    <Spinner
+        android:id="@+id/question_asker_spin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+
+    <TextView
+        android:id="@+id/question_answerer_lab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/question_answerer" />
+
+    <Spinner
+        android:id="@+id/question_answerer_spin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+
+    <TextView
+        android:id="@+id/question_suspect_lab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/question_suspect" />
+
+    <Spinner
+        android:id="@+id/question_suspect_spin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+
+    <TextView
+        android:id="@+id/question_weapon_lab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/question_weapon" />
+
+    <Spinner
+        android:id="@+id/question_weapon_spin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+
+    <TextView
+        android:id="@+id/question_room_lab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/question_room" />
+
+    <Spinner
+        android:id="@+id/question_room_spin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+
+
+
+
+</LinearLayout>
