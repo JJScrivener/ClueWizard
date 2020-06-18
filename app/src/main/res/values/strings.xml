@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">ClueWizard</string>
 
+    <string name="comment_hint">Comment</string>
+
     <!--Button names-->
     <string name="main_btn_new">NEW</string>
     <string name="game_btn">Question</string>

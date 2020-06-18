@@ -6,6 +6,7 @@
 
     <color name="title_text">#DDDDDD</color>
     <color name="comment_text">#000000</color>
+    <color name="comment_hint">#AAAAAA</color>
     <color name="comment_background">#DDDDDD</color>
 
 </resources>

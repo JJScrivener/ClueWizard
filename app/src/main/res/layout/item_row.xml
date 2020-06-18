@@ -27,6 +27,8 @@
         android:layout_weight="1"
         android:background="@color/comment_background"
         android:textColor="@color/comment_text"
+        android:hint="@string/comment_hint"
+        android:textColorHint="@color/comment_hint"
         android:paddingStart="@dimen/comment_padding"
         android:paddingEnd="@dimen/comment_padding"
         android:layout_marginLeft="@dimen/row_side_space"

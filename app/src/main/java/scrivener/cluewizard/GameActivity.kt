@@ -10,21 +10,23 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import java.lang.Integer.max
 
-
+//Todo: Change all hard coded strings to resources!
+//Todo: Set up different languages (different countries have different names for the characters)
+//Todo: Have a config activity to create custom profiles with names for all the items and colours etc.
 class GameActivity : AppCompatActivity() {
 
-    private val playerBoxes = ArrayList<ArrayList<CheckBox>>()
-    private val questions = ArrayList<Question>()
     private val categories = ArrayList<String>()
     private val items = ArrayList<Array<String>>()
     private val players = ArrayList<String>()
-    private var numPlayers = 0
+    private val playerBoxes = ArrayList<ArrayList<CheckBox>>()
+    private val questions = ArrayList<Question>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
-        numPlayers = intent.getIntExtra("numPlayers",1)
+        val numPlayers = intent.getIntExtra("numPlayers",1)
 
+        //Todo: input dialog for player names
         for(player in 0..numPlayers){
 
             val newPlayer = when (player) {
@@ -38,12 +40,15 @@ class GameActivity : AppCompatActivity() {
         for(category in resources.getStringArray(R.array.categories)){
             categories.add(category)
         }
+
+        //Todo: This should be the only place that I use these resources directly
         items.add(resources.getStringArray(R.array.suspects))
         items.add(resources.getStringArray(R.array.weapons))
         items.add(resources.getStringArray(R.array.rooms))
 
         buildGameLayout(numPlayers)
         buildQuestionDialog()
+        inputPlayerNames()
     }
 
     private fun buildGameLayout(numPlayers : Int){
@@ -51,12 +56,13 @@ class GameActivity : AppCompatActivity() {
         for(player in 0 until numPlayers){
             playerBoxes.add(ArrayList())
         }
+
         val rows = ArrayList<View>()
 
         val gameLayout = findViewById<LinearLayout>(R.id.game_layout) //The layout where the game view will be displayed.
         var maxWidth=0 //the max width of the item labels. Used to make all the item TextViews the same size as the longest label.
 
-        for((index,category) in categories.withIndex()){ //For each category build and add the title row and then all the items rows for that category to a the rows array list.
+        for((index,category) in categories.withIndex()){ //For each category build the title row and then all the items rows for that category and add to a the rows array list.
             val titleRow = LayoutInflater.from(this).inflate(R.layout.title_row,gameLayout,false)
             val title = titleRow.findViewById<TextView>(R.id.title)
             title.text = category
@@ -65,8 +71,6 @@ class GameActivity : AppCompatActivity() {
                 val itemRow = LayoutInflater.from(this).inflate(R.layout.item_row,gameLayout, false)
 
                 val comment = itemRow.findViewById<TextView>(R.id.comment)
-                val commentText = "$item comment."
-                comment.text=commentText
                 comment.isSingleLine = true
                 comment.setOnClickListener{addComment(comment)}
 
@@ -102,6 +106,7 @@ class GameActivity : AppCompatActivity() {
 
     }
 
+    //Todo: Can we make a generic allert dialog so that I don't have to have this code all over the place?
     private fun addComment(textView:TextView){
 
         val input = EditText(this)
@@ -174,9 +179,7 @@ class GameActivity : AppCompatActivity() {
 
     private fun addQuestion(asker: Int, answerer: Int, selectedItemIds: ArrayList<Int>, selectedItems: ArrayList<String>) {
         var ans = -1
-        //Todo: Can you make it tidier by making the "No One" player have a value of -1 somehow?
-        if(asker==0 && answerer!=numPlayers){
-            //Todo: make a spinner to select the answer
+        if(asker==0 && answerer!=players.size){
             val input = Spinner(this)
             val inputAdapter: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,selectedItems)
             input.adapter=inputAdapter
@@ -196,6 +199,23 @@ class GameActivity : AppCompatActivity() {
         questions.add(newQuestion)
 
         //todo: search the questions and make the magic happen
+    }
+
+    private fun inputPlayerNames(){
+        for(index in (players.size-2) downTo  0){
+            val input = EditText(this)
+            input.setText(players[index])
+            val dialog: AlertDialog = AlertDialog.Builder(this)
+                .setTitle("What is the player's name?")
+                .setView(input)
+                .setPositiveButton("Set"
+                ) { _, _ ->
+                    players[index] = input.text.toString()
+                }
+                .setNegativeButton("Skip", null)
+                .create()
+            dialog.show()
+        }
     }
 
 }
