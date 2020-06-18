@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("Go"
             ) { _, _ ->
                 val intent = Intent(this,GameActivity::class.java)
-                intent.putExtra("players",input.text.toString().toInt())
+                intent.putExtra("numPlayers",input.text.toString().toInt())
                 startActivity(intent)
             }
             .setNegativeButton("Cancel", null)

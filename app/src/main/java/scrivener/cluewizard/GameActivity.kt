@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import java.lang.Integer.max
 
@@ -15,32 +16,39 @@ class GameActivity : AppCompatActivity() {
     private val playerBoxes = ArrayList<ArrayList<CheckBox>>()
     private val questions = ArrayList<Question>()
     private val categories = ArrayList<String>()
-    private val resItems = ArrayList<Int>()
     private val items = ArrayList<Array<String>>()
+    private val players = ArrayList<String>()
+    private var numPlayers = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
-        val players = intent.getIntExtra("players",1)
+        numPlayers = intent.getIntExtra("numPlayers",1)
+
+        for(player in 0..numPlayers){
+
+            val newPlayer = when (player) {
+                0 -> { "Me" }
+                numPlayers -> { "No one" }
+                else -> { "Player${player+1}" }
+            }
+            players.add(newPlayer)
+        }
 
         for(category in resources.getStringArray(R.array.categories)){
             categories.add(category)
         }
-        resItems.add(R.array.suspects)
-        resItems.add(R.array.weapons)
-        resItems.add(R.array.rooms)
+        items.add(resources.getStringArray(R.array.suspects))
+        items.add(resources.getStringArray(R.array.weapons))
+        items.add(resources.getStringArray(R.array.rooms))
 
-        for(item in resItems){
-            items.add(resources.getStringArray(item))
-        }
-
-        buildGameLayout(players)
+        buildGameLayout(numPlayers)
         buildQuestionDialog()
     }
 
-    private fun buildGameLayout(players : Int){
+    private fun buildGameLayout(numPlayers : Int){
 
-        for(player in 0 until players){
+        for(player in 0 until numPlayers){
             playerBoxes.add(ArrayList())
         }
         val rows = ArrayList<View>()
@@ -68,7 +76,7 @@ class GameActivity : AppCompatActivity() {
                 maxWidth=max(label.measuredWidth,maxWidth)
 
                 val boxesLayout = itemRow.findViewById<LinearLayout>(R.id.boxes_layout)
-                for(player in 0 until players){ //add a checkbox for each player
+                for(player in 0 until numPlayers){ //add a checkbox for each player
                     val box = CheckBox(this)
                     val params = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.MATCH_PARENT)
                     val margin = (-5 * this.resources.displayMetrics.densityDpi / 160)
@@ -117,10 +125,12 @@ class GameActivity : AppCompatActivity() {
 
         val layout = LayoutInflater.from(this).inflate(R.layout.question,findViewById(R.id.activity_game),false)
 
-        //todo: create adaptors for players.
         //todo: think about how to show that a player couldn't answer a question.
+        val playerAdapter: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,players)
         val askerSpin = layout.findViewById<Spinner>(R.id.question_asker_spin)
+        askerSpin.adapter=playerAdapter
         val answererSpin = layout.findViewById<Spinner>(R.id.question_answerer_spin)
+        answererSpin.adapter=playerAdapter
 
         val itemSpins = ArrayList<Spinner>()
         itemSpins.add(layout.findViewById(R.id.question_suspect_spin))
@@ -128,14 +138,8 @@ class GameActivity : AppCompatActivity() {
         itemSpins.add(layout.findViewById(R.id.question_room_spin))
 
         for((index,spin) in itemSpins.withIndex()){
-            ArrayAdapter.createFromResource(
-                this,
-                resItems[index],
-                android.R.layout.simple_spinner_item
-            ).also { adapter ->
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                spin.adapter = adapter
-            }
+            val adapter: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,items[index])
+            spin.adapter=adapter
         }
 
         val dialog: AlertDialog = AlertDialog.Builder(this)
@@ -143,7 +147,17 @@ class GameActivity : AppCompatActivity() {
             .setView(layout)
             .setPositiveButton("Set"
             ) { _, _ ->
-                addQuestion()
+                val asker = askerSpin.selectedItemId.toInt()
+                val answerer = answererSpin.selectedItemId.toInt()
+
+                val selectedItemIds = ArrayList<Int>()
+                val selectedItems = ArrayList<String>()
+                for(spin in itemSpins){
+                    selectedItemIds.add(spin.selectedItemId.toInt())
+                    selectedItems.add(spin.selectedItem.toString())
+                }
+
+                addQuestion(asker, answerer, selectedItemIds, selectedItems)
             }
             .setNegativeButton("Cancel", null)
             .create()
@@ -158,9 +172,27 @@ class GameActivity : AppCompatActivity() {
 
     }
 
-    private fun addQuestion(){
-        //todo: pass in the actual values to make a new question (answer should be -1 for new question that main player didn't ask and answerer should be -1 if no body answered)
-        val newQuestion = Question(1,1,1,1,1,1)
+    private fun addQuestion(asker: Int, answerer: Int, selectedItemIds: ArrayList<Int>, selectedItems: ArrayList<String>) {
+        var ans = -1
+        //Todo: Can you make it tidier by making the "No One" player have a value of -1 somehow?
+        if(asker==0 && answerer!=numPlayers){
+            //Todo: make a spinner to select the answer
+            val input = Spinner(this)
+            val inputAdapter: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,selectedItems)
+            input.adapter=inputAdapter
+            val dialog: AlertDialog = AlertDialog.Builder(this)
+                .setTitle("What was the answer?")
+                .setView(input)
+                .setPositiveButton("Set"
+                ) { _, _ ->
+                    ans = input.selectedItemId.toInt()
+                }
+                .setNegativeButton("Cancel", null)
+                .create()
+            dialog.show()
+        }
+
+        val newQuestion = Question(asker,answerer,selectedItemIds[0],selectedItemIds[1],selectedItemIds[2],ans)
         questions.add(newQuestion)
 
         //todo: search the questions and make the magic happen
