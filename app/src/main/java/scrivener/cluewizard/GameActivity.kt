@@ -14,12 +14,13 @@ import java.lang.Integer.max
 //Todo: Set up different languages (different countries have different names for the characters)
 //Todo: Have a config activity to create custom profiles with names for all the items and colours etc.
 //Todo: Hide the action bar when returning from a different activity or app
+//Todo: Add a dialog to input how many cards each player has
 class GameActivity : AppCompatActivity() {
 
     private val categories = ArrayList<String>()
     private val items = ArrayList<Array<String>>()
     private val players = ArrayList<String>()
-    private val playerBoxes = ArrayList<Box>()
+    private val playerBoxes = ArrayList<ArrayList<Box>>()
     private val questions = ArrayList<Question>()
 
     //States for the boxes
@@ -32,8 +33,12 @@ class GameActivity : AppCompatActivity() {
         setContentView(R.layout.activity_game)
         val numPlayers = intent.getIntExtra("numPlayers",1)
 
-        for(player in 0..numPlayers){
+        for(player in 0 until numPlayers){
+            playerBoxes.add(ArrayList())
+        }
 
+        //set default player names
+        for(player in 0..numPlayers){
             val newPlayer = when (player) {
                 0 -> { "Me" }
                 numPlayers -> { "No one" }
@@ -62,13 +67,13 @@ class GameActivity : AppCompatActivity() {
 
         val gameLayout = findViewById<LinearLayout>(R.id.game_layout) //The layout where the game view will be displayed.
         var maxWidth=0 //the max width of the item labels. Used to make all the item TextViews the same size as the longest label.
-
-        for((index,category) in categories.withIndex()){ //For each category build the title row and then all the items rows for that category and add to a the rows array list.
+        var itemIndex=0
+        for((catIndex,category) in categories.withIndex()){ //For each category build the title row and then all the items rows for that category and add to a the rows array list.
             val titleRow = LayoutInflater.from(this).inflate(R.layout.title_row,gameLayout,false)
             val title = titleRow.findViewById<TextView>(R.id.title)
             title.text = category
             rows.add(titleRow)
-            for(item in items[index]){
+            for(item in items[catIndex]){
                 val itemRow = LayoutInflater.from(this).inflate(R.layout.item_row,gameLayout, false)
 
                 val comment = itemRow.findViewById<TextView>(R.id.comment)
@@ -85,17 +90,18 @@ class GameActivity : AppCompatActivity() {
 
                     val image = ImageView(this)
                     val params = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.MATCH_PARENT)
-                    val box = Box(image,item,player)
+                    val box = Box(image,itemIndex,player)
                     if(player==0){
                         image.isClickable=true
                         image.setOnClickListener{clickBox(box)}
                         box.state=State(no)
                     }
                     boxesLayout.addView(image,params)
-                    playerBoxes.add(box)
+                    playerBoxes[player].add(box)
                 }
 
                 rows.add(itemRow)
+                itemIndex++
             }
         }
         for(row in rows){ //add the rows to the layout
@@ -133,7 +139,7 @@ class GameActivity : AppCompatActivity() {
         val layout = LayoutInflater.from(this).inflate(R.layout.question,findViewById(R.id.activity_game),false)
 
         //todo: think about how to show that a player couldn't answer a question.
-        val playerAdapter: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,players)
+        val playerAdapter: ArrayAdapter<String> = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,players)
         val askerSpin = layout.findViewById<Spinner>(R.id.question_asker_spin)
         askerSpin.adapter=playerAdapter
         val answererSpin = layout.findViewById<Spinner>(R.id.question_answerer_spin)
@@ -145,7 +151,7 @@ class GameActivity : AppCompatActivity() {
         itemSpins.add(layout.findViewById(R.id.question_room_spin))
 
         for((index,spin) in itemSpins.withIndex()){
-            val adapter: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,items[index])
+            val adapter: ArrayAdapter<String> = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,items[index])
             spin.adapter=adapter
         }
 
@@ -182,7 +188,7 @@ class GameActivity : AppCompatActivity() {
     private fun addQuestion(asker: Int, answerer: Int, selectedItemIds: ArrayList<Int>, selectedItems: ArrayList<String>) {
         if(asker==0 && answerer!=players.size){
             val input = Spinner(this)
-            val inputAdapter: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,selectedItems)
+            val inputAdapter: ArrayAdapter<String> = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,selectedItems)
             input.adapter=inputAdapter
             val dialog: AlertDialog = AlertDialog.Builder(this)
                 .setTitle("What was the answer?")
@@ -232,17 +238,30 @@ class GameActivity : AppCompatActivity() {
             yes->State(no)
             else->State(unsure)
         }
-        for(otherBox in playerBoxes){
-            if(otherBox!=box && otherBox.item.equals(box.item)){
-                otherBox.state = state
+        
+        for(player in playerBoxes){
+            if(player[box.item]!=box){
+                player[box.item].state=state
             }
         }
+
     }
 
     private fun checkQuestions(){
-        for(box in playerBoxes){
-            box.state=State(unsure)
-        }
+//        for(question in questions){
+//            //if the question was answered immediately
+//            if(question.answerer-question.asker==1 || question.answerer-question.asker==players.size){
+//
+//                for(box in playerBoxes){
+//                    if(box.item==question.sus ){
+//
+//                    }
+//                }
+//            }
+//            else{
+//
+//            }
+//        }
     }
 
 }

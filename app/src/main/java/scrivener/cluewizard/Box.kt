@@ -4,7 +4,7 @@ import android.widget.ImageView
 import java.lang.Exception
 
 //The state can be 0 = no; 1 = yes; 2 = unsure
-class Box (private val image: ImageView, val item: String, val player: Int) {
+class Box (private val image: ImageView, val item: Int, val player: Int) {
 
     private val no = 0
     private val yes = 1
