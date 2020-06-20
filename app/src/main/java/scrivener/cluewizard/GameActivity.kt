@@ -169,8 +169,13 @@ class GameActivity : AppCompatActivity() {
 
                 val selectedItemIds = ArrayList<Int>()
                 val selectedItems = ArrayList<String>()
-                for(spin in itemSpins){
-                    selectedItemIds.add(spin.selectedItemId.toInt())
+                for((index, spin) in itemSpins.withIndex()){
+                    var id = spin.selectedItemId.toInt()
+                    for(category in 0 until index){
+                        id+=items[category].size
+                    }
+                    println("the id is $id")
+                    selectedItemIds.add(id)
                     selectedItems.add(spin.selectedItem.toString())
                 }
 
@@ -207,7 +212,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun addQuestion(asker: Int, answerer: Int, selectedItemIds: ArrayList<Int>, ans: Int){
-        val newQuestion = Question(asker,answerer,selectedItemIds[0],items[0].size+selectedItemIds[1],items[0].size+items[1].size+selectedItemIds[2],ans)
+        val newQuestion = Question(asker,answerer,selectedItemIds,ans)
         questions.add(newQuestion)
         checkQuestions()
     }
@@ -252,9 +257,9 @@ class GameActivity : AppCompatActivity() {
             //if the question was answered immediately
             if(question.answerer - question.asker == 1 || question.answerer == 0 && question.asker == numPlayers-1){
                 //Todo: make the question items an array so I can put this in a loop
-                playerBoxes[question.answerer][question.sus].state=State(yes)
-                playerBoxes[question.answerer][question.wep].state=State(yes)
-                playerBoxes[question.answerer][question.room].state=State(yes)
+                for(item in question.items){
+                    playerBoxes[question.answerer][item].state=State(yes)
+                }
             }
             else{
 
