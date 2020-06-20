@@ -13,20 +13,25 @@ import java.lang.Integer.max
 //Todo: Change all hard coded strings to resources!
 //Todo: Set up different languages (different countries have different names for the characters)
 //Todo: Have a config activity to create custom profiles with names for all the items and colours etc.
+//Todo: Hide the action bar when returning from a different activity or app
 class GameActivity : AppCompatActivity() {
 
     private val categories = ArrayList<String>()
     private val items = ArrayList<Array<String>>()
     private val players = ArrayList<String>()
-    private val playerBoxes = ArrayList<ArrayList<CheckBox>>()
+    private val playerBoxes = ArrayList<Box>()
     private val questions = ArrayList<Question>()
+
+    //States for the boxes
+    private val no = 0
+    private val yes = 1
+    private val unsure = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
         val numPlayers = intent.getIntExtra("numPlayers",1)
 
-        //Todo: input dialog for player names
         for(player in 0..numPlayers){
 
             val newPlayer = when (player) {
@@ -53,10 +58,6 @@ class GameActivity : AppCompatActivity() {
 
     private fun buildGameLayout(numPlayers : Int){
 
-        for(player in 0 until numPlayers){
-            playerBoxes.add(ArrayList())
-        }
-
         val rows = ArrayList<View>()
 
         val gameLayout = findViewById<LinearLayout>(R.id.game_layout) //The layout where the game view will be displayed.
@@ -81,16 +82,17 @@ class GameActivity : AppCompatActivity() {
 
                 val boxesLayout = itemRow.findViewById<LinearLayout>(R.id.boxes_layout)
                 for(player in 0 until numPlayers){ //add a checkbox for each player
-                    val box = CheckBox(this)
-                    val params = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.MATCH_PARENT)
-                    val margin = (-5 * this.resources.displayMetrics.densityDpi / 160)
-                    params.marginEnd=margin
-                    if(player>0){
-                        box.isClickable=false
-                    }
 
-                    boxesLayout.addView(box,params)
-                    playerBoxes[player].add(box)
+                    val image = ImageView(this)
+                    val params = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.MATCH_PARENT)
+                    val box = Box(image,item,player)
+                    if(player==0){
+                        image.isClickable=true
+                        image.setOnClickListener{clickBox(box)}
+                        box.state=State(no)
+                    }
+                    boxesLayout.addView(image,params)
+                    playerBoxes.add(box)
                 }
 
                 rows.add(itemRow)
@@ -106,7 +108,7 @@ class GameActivity : AppCompatActivity() {
 
     }
 
-    //Todo: Can we make a generic allert dialog so that I don't have to have this code all over the place?
+    //Todo: Can we make a generic alert dialog so that I don't have to have this code all over the place?
     private fun addComment(textView:TextView){
 
         val input = EditText(this)
@@ -178,7 +180,6 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun addQuestion(asker: Int, answerer: Int, selectedItemIds: ArrayList<Int>, selectedItems: ArrayList<String>) {
-        var ans = -1
         if(asker==0 && answerer!=players.size){
             val input = Spinner(this)
             val inputAdapter: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,selectedItems)
@@ -188,15 +189,22 @@ class GameActivity : AppCompatActivity() {
                 .setView(input)
                 .setPositiveButton("Set"
                 ) { _, _ ->
-                    ans = input.selectedItemId.toInt()
+                    val ans = input.selectedItemId.toInt()
+                    val newQuestion = Question(asker,answerer,selectedItemIds[0],selectedItemIds[1],selectedItemIds[2],ans)
+                    questions.add(newQuestion)
+                    checkQuestions()
                 }
                 .setNegativeButton("Cancel", null)
                 .create()
             dialog.show()
         }
+        else{
+            val newQuestion = Question(asker,answerer,selectedItemIds[0],selectedItemIds[1],selectedItemIds[2],-1)
+            questions.add(newQuestion)
+            checkQuestions()
+        }
 
-        val newQuestion = Question(asker,answerer,selectedItemIds[0],selectedItemIds[1],selectedItemIds[2],ans)
-        questions.add(newQuestion)
+
 
         //todo: search the questions and make the magic happen
     }
@@ -215,6 +223,25 @@ class GameActivity : AppCompatActivity() {
                 .setNegativeButton("Skip", null)
                 .create()
             dialog.show()
+        }
+    }
+
+    private fun clickBox(box: Box){
+        box.state = box.state.not()
+        val state = when(box.state.state){
+            yes->State(no)
+            else->State(unsure)
+        }
+        for(otherBox in playerBoxes){
+            if(otherBox!=box && otherBox.item.equals(box.item)){
+                otherBox.state = state
+            }
+        }
+    }
+
+    private fun checkQuestions(){
+        for(box in playerBoxes){
+            box.state=State(unsure)
         }
     }
 
