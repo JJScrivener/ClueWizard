@@ -19,9 +19,10 @@ class GameActivity : AppCompatActivity() {
 
     private val categories = ArrayList<String>()
     private val items = ArrayList<Array<String>>()
-    private val players = ArrayList<String>()
+    private val playerNames = ArrayList<String>()
     private val playerBoxes = ArrayList<ArrayList<Box>>()
     private val questions = ArrayList<Question>()
+    private var numPlayers = 0
 
     //States for the boxes
     private val no = 0
@@ -31,7 +32,7 @@ class GameActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
-        val numPlayers = intent.getIntExtra("numPlayers",1)
+        numPlayers = intent.getIntExtra("numPlayers",1)
 
         for(player in 0 until numPlayers){
             playerBoxes.add(ArrayList())
@@ -44,7 +45,7 @@ class GameActivity : AppCompatActivity() {
                 numPlayers -> { "No one" }
                 else -> { "Player${player+1}" }
             }
-            players.add(newPlayer)
+            playerNames.add(newPlayer)
         }
 
         for(category in resources.getStringArray(R.array.categories)){
@@ -139,7 +140,7 @@ class GameActivity : AppCompatActivity() {
         val layout = LayoutInflater.from(this).inflate(R.layout.question,findViewById(R.id.activity_game),false)
 
         //todo: think about how to show that a player couldn't answer a question.
-        val playerAdapter: ArrayAdapter<String> = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,players)
+        val playerAdapter: ArrayAdapter<String> = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,playerNames)
         val askerSpin = layout.findViewById<Spinner>(R.id.question_asker_spin)
         askerSpin.adapter=playerAdapter
         val answererSpin = layout.findViewById<Spinner>(R.id.question_answerer_spin)
@@ -186,7 +187,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun addQuestion(asker: Int, answerer: Int, selectedItemIds: ArrayList<Int>, selectedItems: ArrayList<String>) {
-        if(asker==0 && answerer!=players.size){
+        if(asker==0 && answerer!=numPlayers+1){
             val input = Spinner(this)
             val inputAdapter: ArrayAdapter<String> = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,selectedItems)
             input.adapter=inputAdapter
@@ -195,8 +196,8 @@ class GameActivity : AppCompatActivity() {
                 .setView(input)
                 .setPositiveButton("Set"
                 ) { _, _ ->
-                    val ans = input.selectedItemId.toInt()
-                    val newQuestion = Question(asker,answerer,selectedItemIds[0],selectedItemIds[1],selectedItemIds[2],ans)
+                    val ans = selectedItemIds[input.selectedItemId.toInt()]
+                    val newQuestion = Question(asker,answerer,selectedItemIds[0],items[0].size+selectedItemIds[1],items[0].size+items[1].size+selectedItemIds[2],ans)
                     questions.add(newQuestion)
                     checkQuestions()
                 }
@@ -205,26 +206,23 @@ class GameActivity : AppCompatActivity() {
             dialog.show()
         }
         else{
-            val newQuestion = Question(asker,answerer,selectedItemIds[0],selectedItemIds[1],selectedItemIds[2],-1)
+            val newQuestion = Question(asker,answerer,selectedItemIds[0],items[0].size+selectedItemIds[1],items[0].size+items[1].size+selectedItemIds[2],-1)
             questions.add(newQuestion)
             checkQuestions()
         }
 
-
-
-        //todo: search the questions and make the magic happen
     }
 
     private fun inputPlayerNames(){
-        for(index in (players.size-2) downTo  0){
+        for(index in (numPlayers-1) downTo  0){
             val input = EditText(this)
-            input.setText(players[index])
+            input.setText(playerNames[index])
             val dialog: AlertDialog = AlertDialog.Builder(this)
                 .setTitle("What is the player's name?")
                 .setView(input)
                 .setPositiveButton("Set"
                 ) { _, _ ->
-                    players[index] = input.text.toString()
+                    playerNames[index] = input.text.toString()
                 }
                 .setNegativeButton("Skip", null)
                 .create()
@@ -238,7 +236,7 @@ class GameActivity : AppCompatActivity() {
             yes->State(no)
             else->State(unsure)
         }
-        
+
         for(player in playerBoxes){
             if(player[box.item]!=box){
                 player[box.item].state=state
@@ -248,20 +246,18 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun checkQuestions(){
-//        for(question in questions){
-//            //if the question was answered immediately
-//            if(question.answerer-question.asker==1 || question.answerer-question.asker==players.size){
-//
-//                for(box in playerBoxes){
-//                    if(box.item==question.sus ){
-//
-//                    }
-//                }
-//            }
-//            else{
-//
-//            }
-//        }
+        for(question in questions){
+            //if the question was answered immediately
+            if(question.answerer - question.asker == 1 || question.answerer == 0 && question.asker == numPlayers-1){
+                //Todo: make the question items an array so I can put this in a loop
+                playerBoxes[question.answerer][question.sus].state=State(yes)
+                playerBoxes[question.answerer][question.wep].state=State(yes)
+                playerBoxes[question.answerer][question.room].state=State(yes)
+            }
+            else{
+
+            }
+        }
     }
 
 }
