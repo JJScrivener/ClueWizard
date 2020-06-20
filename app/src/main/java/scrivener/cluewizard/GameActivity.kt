@@ -69,7 +69,7 @@ class GameActivity : AppCompatActivity() {
         val gameLayout = findViewById<LinearLayout>(R.id.game_layout) //The layout where the game view will be displayed.
         var maxWidth=0 //the max width of the item labels. Used to make all the item TextViews the same size as the longest label.
         var itemIndex=0
-        for((catIndex,category) in categories.withIndex()){ //For each category build the title row and then all the items rows for that category and add to a the rows array list.
+        for((catIndex,category) in categories.withIndex()){ //For each category build the title row and then all the items rows for that category and add to the rows array list.
             val titleRow = LayoutInflater.from(this).inflate(R.layout.title_row,gameLayout,false)
             val title = titleRow.findViewById<TextView>(R.id.title)
             title.text = category
@@ -140,6 +140,9 @@ class GameActivity : AppCompatActivity() {
         val layout = LayoutInflater.from(this).inflate(R.layout.question,findViewById(R.id.activity_game),false)
 
         //todo: think about how to show that a player couldn't answer a question.
+        //Todo: For now I am just going to assume that players answer in order and if the answer is not next to the asker the people between couldn't answer.
+
+        //Todo: Make the answer and asker spinners mutually exclusive. i.e. if ask = P1 then ans != P1 and vice versa.
         val playerAdapter: ArrayAdapter<String> = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,playerNames)
         val askerSpin = layout.findViewById<Spinner>(R.id.question_asker_spin)
         askerSpin.adapter=playerAdapter
@@ -171,22 +174,16 @@ class GameActivity : AppCompatActivity() {
                     selectedItems.add(spin.selectedItem.toString())
                 }
 
-                addQuestion(asker, answerer, selectedItemIds, selectedItems)
+                checkAnswer(asker, answerer, selectedItemIds, selectedItems)
             }
             .setNegativeButton("Cancel", null)
             .create()
 
-        gameBtn.setOnClickListener {askQuestion(dialog)}
+        gameBtn.setOnClickListener {dialog.show()}
 
     }
 
-    private fun askQuestion(dialog: AlertDialog){
-
-        dialog.show()
-
-    }
-
-    private fun addQuestion(asker: Int, answerer: Int, selectedItemIds: ArrayList<Int>, selectedItems: ArrayList<String>) {
+    private fun checkAnswer(asker: Int, answerer: Int, selectedItemIds: ArrayList<Int>, selectedItems: ArrayList<String>) {
         if(asker==0 && answerer!=numPlayers+1){
             val input = Spinner(this)
             val inputAdapter: ArrayAdapter<String> = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,selectedItems)
@@ -197,20 +194,22 @@ class GameActivity : AppCompatActivity() {
                 .setPositiveButton("Set"
                 ) { _, _ ->
                     val ans = selectedItemIds[input.selectedItemId.toInt()]
-                    val newQuestion = Question(asker,answerer,selectedItemIds[0],items[0].size+selectedItemIds[1],items[0].size+items[1].size+selectedItemIds[2],ans)
-                    questions.add(newQuestion)
-                    checkQuestions()
+                    addQuestion(asker,answerer,selectedItemIds,ans)
                 }
                 .setNegativeButton("Cancel", null)
                 .create()
             dialog.show()
         }
         else{
-            val newQuestion = Question(asker,answerer,selectedItemIds[0],items[0].size+selectedItemIds[1],items[0].size+items[1].size+selectedItemIds[2],-1)
-            questions.add(newQuestion)
-            checkQuestions()
+            addQuestion(asker,answerer,selectedItemIds,-1)
         }
 
+    }
+
+    private fun addQuestion(asker: Int, answerer: Int, selectedItemIds: ArrayList<Int>, ans: Int){
+        val newQuestion = Question(asker,answerer,selectedItemIds[0],items[0].size+selectedItemIds[1],items[0].size+items[1].size+selectedItemIds[2],ans)
+        questions.add(newQuestion)
+        checkQuestions()
     }
 
     private fun inputPlayerNames(){
@@ -230,6 +229,9 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
+
+    //Onclick listener for main player's boxes.
+    //Toggles between yes and no and sets the same item for other players to: no if yes or unsure if no
     private fun clickBox(box: Box){
         box.state = box.state.not()
         val state = when(box.state.state){
