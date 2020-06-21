@@ -213,6 +213,7 @@ class GameActivity : AppCompatActivity() {
 
     private fun addQuestion(asker: Int, answerer: Int, selectedItemIds: ArrayList<Int>, ans: Int){
         val newQuestion = Question(asker,answerer,selectedItemIds,ans)
+        if(ans>=0) updateRowState(playerBoxes[newQuestion.answerer][newQuestion.ans])
         questions.add(newQuestion)
         checkQuestions()
     }
@@ -253,16 +254,42 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun checkQuestions(){
+        var newInfo = false
         for(question in questions){
-            //if the question was answered immediately
-            if(question.answerer - question.asker == 1 || question.answerer == 0 && question.asker == numPlayers-1){
-                //Todo: make the question items an array so I can put this in a loop
-                for(item in question.items){
-                    playerBoxes[question.answerer][item].state=State(yes)
+            //if we don't already know the answer to that question
+            if(question.ans<0){
+                //if the question was answered immediately
+                //Todo: I think we can get rid of the second condition because if the answerer is 0 we already know the answer
+                //Todo: I think we can combine the if and else
+                if(question.answerer - question.asker == 1 || question.answerer == 0 && question.asker == numPlayers-1){
+                    val possibleAnswers = ArrayList<Int>()
+                    for(item in question.items){
+                        //as long as we don't definitely not know it we can add it to the possible answers
+                        if(playerBoxes[question.answerer][item].state.state!=0){
+                            possibleAnswers.add(item)
+                        }
+                    }
+                    //if the answerer has only one item that they could possible know that must be the answer
+                    if(possibleAnswers.size==1){
+                        question.ans=possibleAnswers[0]
+                        updateRowState(playerBoxes[question.answerer][question.ans])
+                        newInfo=true
+                    }
+                }
+                //if some people couldn't answer the question
+                else{
+
                 }
             }
-            else{
+        }
+        if(newInfo) checkQuestions()
+    }
 
+    private fun updateRowState(box: Box){
+        box.state=State(yes)
+        for(player in playerBoxes){
+            if(player[box.item]!=box){
+                player[box.item].state=State(no)
             }
         }
     }
