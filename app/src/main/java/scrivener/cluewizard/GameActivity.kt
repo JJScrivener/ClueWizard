@@ -259,23 +259,13 @@ class GameActivity : AppCompatActivity() {
     private fun checkQuestions(){
         var newInfo = false
 
-        //if no one answered the question
-        if(questions[0].answerer==numPlayers){
-            for(player in 0 until numPlayers){
-                for(item in questions[0].items){
-                    playerBoxes[player][item].state=State(no)
-                }
+        //for all the players who couldn't answer the question set the state to no for all items in the question.
+        var currentPlayer = (questions[0].asker+1)%numPlayers
+        while((currentPlayer)!=questions[0].answerer && (currentPlayer)!=questions[0].asker){
+            for(item in questions[0].items){
+                playerBoxes[currentPlayer][item].state=State(no)
             }
-        }
-        else{//else someone answered the question
-            //for all the players who couldn't answer the question set the state to no for all items in the question.
-            var currentPlayer = (questions[0].asker+1)%numPlayers
-            while((currentPlayer)!=questions[0].answerer){
-                for(item in questions[0].items){
-                    playerBoxes[currentPlayer][item].state=State(no)
-                }
-                currentPlayer=(currentPlayer+1)%numPlayers
-            }
+            currentPlayer=(currentPlayer+1)%numPlayers
         }
 
         for(question in questions){
