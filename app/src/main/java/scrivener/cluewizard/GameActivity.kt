@@ -188,7 +188,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun checkAnswer(asker: Int, answerer: Int, selectedItemIds: ArrayList<Int>, selectedItems: ArrayList<String>) {
-        if(asker==0 && answerer!=numPlayers+1){
+        if(asker==0 && answerer!=numPlayers){
             val input = Spinner(this)
             val inputAdapter: ArrayAdapter<String> = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,selectedItems)
             input.adapter=inputAdapter
@@ -255,13 +255,23 @@ class GameActivity : AppCompatActivity() {
     private fun checkQuestions(){
         var newInfo = false
 
-        //for all the players who couldn't answer the question set the state to no for all items in the question.
-        var currentPlayer = (questions[0].asker+1)%numPlayers
-        while((currentPlayer)!=questions[0].answerer){
-            for(item in questions[0].items){
-                playerBoxes[currentPlayer][item].state=State(no)
+        //if no one answered the question
+        if(questions[0].answerer==numPlayers){
+            for(player in 0 until numPlayers){
+                for(item in questions[0].items){
+                    playerBoxes[player][item].state=State(no)
+                }
             }
-            currentPlayer=(currentPlayer+1)%numPlayers
+        }
+        else{//else someone answered the question
+            //for all the players who couldn't answer the question set the state to no for all items in the question.
+            var currentPlayer = (questions[0].asker+1)%numPlayers
+            while((currentPlayer)!=questions[0].answerer){
+                for(item in questions[0].items){
+                    playerBoxes[currentPlayer][item].state=State(no)
+                }
+                currentPlayer=(currentPlayer+1)%numPlayers
+            }
         }
 
         for(question in questions){
