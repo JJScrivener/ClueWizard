@@ -205,7 +205,11 @@ class GameActivity : AppCompatActivity() {
             dialog.show()
         }
         else{
-            addQuestion(asker,answerer,selectedItemIds,-1)
+            var ans = when(answerer){
+                numPlayers -> -2
+                else -> -1
+            }
+            addQuestion(asker,answerer,selectedItemIds,ans)
         }
 
     }
@@ -276,7 +280,7 @@ class GameActivity : AppCompatActivity() {
 
         for(question in questions){
             //if we don't already know the answer to that question
-            if(question.ans<0){
+            if(question.ans==-1){
                 val possibleAnswers = ArrayList<Int>()
                 var alreadyKnown = false
                 for(item in question.items){

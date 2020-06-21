@@ -1,6 +1,5 @@
 package scrivener.cluewizard
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
@@ -34,6 +33,7 @@ class MainActivity : AppCompatActivity() {
             .setView(input)
             .setPositiveButton("Go"
             ) { _, _ ->
+                //Todo: verify that the input is valid
                 val intent = Intent(this,GameActivity::class.java)
                 intent.putExtra("numPlayers",input.text.toString().toInt())
                 startActivity(intent)
@@ -45,9 +45,5 @@ class MainActivity : AppCompatActivity() {
 
 
     }
-    private inline fun <reified T: Activity> Activity.startActivity() {
-        startActivity(Intent(this, T::class.java))
-    }
-
 
 }
