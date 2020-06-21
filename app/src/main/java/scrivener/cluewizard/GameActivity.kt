@@ -174,7 +174,6 @@ class GameActivity : AppCompatActivity() {
                     for(category in 0 until index){
                         id+=items[category].size
                     }
-                    println("the id is $id")
                     selectedItemIds.add(id)
                     selectedItems.add(spin.selectedItem.toString())
                 }
@@ -214,7 +213,7 @@ class GameActivity : AppCompatActivity() {
     private fun addQuestion(asker: Int, answerer: Int, selectedItemIds: ArrayList<Int>, ans: Int){
         val newQuestion = Question(asker,answerer,selectedItemIds,ans)
         if(ans>=0) updateRowState(playerBoxes[newQuestion.answerer][newQuestion.ans])
-        questions.add(newQuestion)
+        questions.add(0,newQuestion)
         checkQuestions()
     }
 
@@ -255,30 +254,38 @@ class GameActivity : AppCompatActivity() {
 
     private fun checkQuestions(){
         var newInfo = false
+
+        //for all the players who couldn't answer the question set the state to no for all items in the question.
+        var currentPlayer = (questions[0].asker+1)%numPlayers
+        while((currentPlayer)!=questions[0].answerer){
+            for(item in questions[0].items){
+                playerBoxes[currentPlayer][item].state=State(no)
+            }
+            currentPlayer=(currentPlayer+1)%numPlayers
+        }
+
         for(question in questions){
             //if we don't already know the answer to that question
             if(question.ans<0){
-                //if the question was answered immediately
-                //Todo: I think we can get rid of the second condition because if the answerer is 0 we already know the answer
-                //Todo: I think we can combine the if and else
-                if(question.answerer - question.asker == 1 || question.answerer == 0 && question.asker == numPlayers-1){
-                    val possibleAnswers = ArrayList<Int>()
-                    for(item in question.items){
-                        //as long as we don't definitely not know it we can add it to the possible answers
-                        if(playerBoxes[question.answerer][item].state.state!=0){
-                            possibleAnswers.add(item)
-                        }
+                val possibleAnswers = ArrayList<Int>()
+                var alreadyKnown = false
+                for(item in question.items){
+                    //if we know that the answerer has one of the items, we have to assume that it is the item that was shown.
+                    if(playerBoxes[question.answerer][item].state.state==yes){
+                        alreadyKnown=true
+                        question.ans=item
+                        break
                     }
-                    //if the answerer has only one item that they could possible know that must be the answer
-                    if(possibleAnswers.size==1){
-                        question.ans=possibleAnswers[0]
-                        updateRowState(playerBoxes[question.answerer][question.ans])
-                        newInfo=true
+                    //if we are unsure if the player has that item or not it is a possible answer
+                    else if(playerBoxes[question.answerer][item].state.state==unsure){
+                        possibleAnswers.add(item)
                     }
                 }
-                //if some people couldn't answer the question
-                else{
-
+                //if we don't already know that the answerer has one of the items and the answerer has only one item that they could possibly have, that must be the answer.
+                if(!alreadyKnown && possibleAnswers.size==1){
+                    question.ans=possibleAnswers[0]
+                    updateRowState(playerBoxes[question.answerer][question.ans])
+                    newInfo=true
                 }
             }
         }
