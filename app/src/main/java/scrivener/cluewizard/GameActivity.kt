@@ -72,6 +72,8 @@ class GameActivity : AppCompatActivity() {
         for((catIndex,category) in categories.withIndex()){ //For each category build the title row and then all the items rows for that category and add to the rows array list.
             val titleRow = LayoutInflater.from(this).inflate(R.layout.title_row,gameLayout,false)
             val title = titleRow.findViewById<TextView>(R.id.title)
+            title.isClickable=true
+            title.setOnClickListener { changeItemName(title) }
             title.text = category
             rows.add(titleRow)
             for(item in items[catIndex]){
@@ -84,6 +86,8 @@ class GameActivity : AppCompatActivity() {
                 val label = itemRow.findViewById<TextView>(R.id.label)
                 label.text = item
                 label.measure(0,0)
+                label.isClickable=true
+                label.setOnClickListener { changeItemName(label) }
                 maxWidth=max(label.measuredWidth,maxWidth)
 
                 val boxesLayout = itemRow.findViewById<LinearLayout>(R.id.boxes_layout)
@@ -115,17 +119,16 @@ class GameActivity : AppCompatActivity() {
 
     }
 
-    //Todo: Can we make a generic alert dialog so that I don't have to have this code all over the place?
-    private fun addComment(textView:TextView){
+    private fun addComment(comment: TextView){
 
         val input = EditText(this)
-        input.setText(textView.text)
+        input.setText(comment.text)
         val dialog: AlertDialog = AlertDialog.Builder(this)
             .setTitle("Comment")
             .setView(input)
             .setPositiveButton("Set"
             ) { _, _ ->
-                textView.text = input.text.toString()
+                comment.text = input.text.toString()
             }
             .setNegativeButton("Cancel", null)
             .create()
@@ -133,14 +136,26 @@ class GameActivity : AppCompatActivity() {
 
     }
 
+    private fun changeItemName(item: TextView){
+        val input = EditText(this)
+        input.setText(item.text)
+        val dialog: AlertDialog = AlertDialog.Builder(this)
+            .setTitle("Change name")
+            .setView(input)
+            .setPositiveButton("Set"
+            ) { _, _ ->
+                item.text = input.text.toString()
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+        dialog.show()
+    }
+
     private fun buildQuestionDialog(){
 
         val gameBtn = findViewById<Button>(R.id.game_btn)
 
         val layout = LayoutInflater.from(this).inflate(R.layout.question,findViewById(R.id.activity_game),false)
-
-        //todo: think about how to show that a player couldn't answer a question.
-        //Todo: For now I am just going to assume that players answer in order and if the answer is not next to the asker the people between couldn't answer.
 
         //Todo: Make the answer and asker spinners mutually exclusive. i.e. if ask = P1 then ans != P1 and vice versa.
         val playerAdapter: ArrayAdapter<String> = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,playerNames)
@@ -205,7 +220,7 @@ class GameActivity : AppCompatActivity() {
             dialog.show()
         }
         else{
-            var ans = when(answerer){
+            val ans = when(answerer){
                 numPlayers -> -2
                 else -> -1
             }
