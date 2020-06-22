@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.*
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import java.lang.Integer.max
 
 //Todo: Change all hard coded strings to resources!
@@ -58,7 +59,10 @@ class GameActivity : AppCompatActivity() {
         items.add(resources.getStringArray(R.array.rooms))
 
         buildGameLayout(numPlayers)
-        buildQuestionDialog()
+
+        if(numPlayers==1)   findViewById<Button>(R.id.game_btn).visibility=View.INVISIBLE
+        else                buildQuestionDialog()
+
         inputPlayerNames()
     }
 
