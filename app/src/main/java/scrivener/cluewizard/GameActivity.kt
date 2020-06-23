@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.*
-import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import java.lang.Integer.max
 
@@ -32,6 +31,7 @@ class GameActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_game)
         numPlayers = intent.getIntExtra("numPlayers",1)
 
@@ -64,6 +64,23 @@ class GameActivity : AppCompatActivity() {
         else                buildQuestionDialog()
 
         inputPlayerNames()
+    }
+
+    override fun onStart(){
+        super.onStart()
+        window.decorView.apply { systemUiVisibility =
+            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        }
+
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            window.decorView.apply { systemUiVisibility =
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            }
+        }
     }
 
     private fun buildGameLayout(numPlayers : Int){
