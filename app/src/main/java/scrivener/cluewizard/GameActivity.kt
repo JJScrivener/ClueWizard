@@ -5,10 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.*
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import java.lang.Integer.max
 
 //Todo: Change all hard coded strings to resources!
@@ -67,9 +67,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun buildGameLayout(numPlayers : Int){
-
         val rows = ArrayList<View>()
-
         val gameLayout = findViewById<LinearLayout>(R.id.game_layout) //The layout where the game view will be displayed.
         var maxWidth=0 //the max width of the item labels. Used to make all the item TextViews the same size as the longest label.
         var itemIndex=0
@@ -124,8 +122,8 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun addComment(comment: TextView){
-
         val input = EditText(this)
+        input.requestFocus()
         input.setText(comment.text)
         val dialog: AlertDialog = AlertDialog.Builder(this)
             .setTitle("Comment")
@@ -136,12 +134,14 @@ class GameActivity : AppCompatActivity() {
             }
             .setNegativeButton("Cancel", null)
             .create()
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
         dialog.show()
 
     }
 
     private fun changeItemName(item: TextView){
         val input = EditText(this)
+        input.requestFocus()
         input.setText(item.text)
         val dialog: AlertDialog = AlertDialog.Builder(this)
             .setTitle("Change name")
@@ -152,6 +152,7 @@ class GameActivity : AppCompatActivity() {
             }
             .setNegativeButton("Cancel", null)
             .create()
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
         dialog.show()
     }
 
@@ -243,7 +244,8 @@ class GameActivity : AppCompatActivity() {
     private fun inputPlayerNames(){
         for(index in (numPlayers-1) downTo  0){
             val input = EditText(this)
-            input.setText(playerNames[index])
+            input.requestFocus()
+            input.hint = playerNames[index]
             val dialog: AlertDialog = AlertDialog.Builder(this)
                 .setTitle("What is the player's name?")
                 .setView(input)
@@ -253,6 +255,7 @@ class GameActivity : AppCompatActivity() {
                 }
                 .setNegativeButton("Skip", null)
                 .create()
+            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
             dialog.show()
         }
     }

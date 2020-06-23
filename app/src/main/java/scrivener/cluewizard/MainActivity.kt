@@ -4,12 +4,11 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import java.lang.Exception
-import java.lang.NumberFormatException
 
 
 class MainActivity : AppCompatActivity() {
@@ -31,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startNewGame(){
         val input = EditText(this)
+        input.requestFocus()
         val dialog: AlertDialog = AlertDialog.Builder(this)
             .setTitle("How many players?")
             .setView(input)
@@ -42,22 +42,19 @@ class MainActivity : AppCompatActivity() {
                         val intent = Intent(this,GameActivity::class.java)
                         intent.putExtra("numPlayers",numPlayers)
                         startActivity(intent)
-                    }
+                    } else throw java.lang.NumberFormatException()
                 }catch(e: NumberFormatException){
                     println(e)
+                    val text = "Please enter a valid number of players!"
+                    val duration = Toast.LENGTH_SHORT
+                    val toast = Toast.makeText(applicationContext, text, duration)
+                    toast.show()
                 }
-                
-                val text = "Please enter a valid number of players!"
-                val duration = Toast.LENGTH_SHORT
-                val toast = Toast.makeText(applicationContext, text, duration)
-                toast.show()
-
             }
             .setNegativeButton("Cancel", null)
             .create()
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
         dialog.show()
-
-
 
     }
 
