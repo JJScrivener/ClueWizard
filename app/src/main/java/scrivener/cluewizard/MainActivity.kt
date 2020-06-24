@@ -51,7 +51,8 @@ class MainActivity : AppCompatActivity() {
                     val numPlayers = input.text.toString().toInt()
                     if(numPlayers in 1..6){
                         val intent = Intent(this,GameActivity::class.java)
-                        intent.putExtra("numPlayers",numPlayers)
+                        val game = Game(numPlayers,resources)
+                        intent.putExtra("game",game)
                         startActivity(intent)
                     } else throw java.lang.NumberFormatException()
                 }catch(e: NumberFormatException){
