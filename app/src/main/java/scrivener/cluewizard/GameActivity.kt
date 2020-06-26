@@ -15,11 +15,12 @@ import java.lang.Integer.max
 //Todo: Change all hard coded strings to resources!
 //Todo: Set up different languages (different countries have different names for the characters)
 //Todo: Have a config activity to create custom profiles with names for all the items and colours etc.
-//Todo: Hide the action bar when returning from a different activity or app
 //Todo: Add a dialog to input how many cards each player has
 class GameActivity : AppCompatActivity() {
 
-    private val playerBoxes = ArrayList<ArrayList<Box>>()
+    private val playerBoxes = ArrayList<ArrayList<IndexImage>>()
+    private val comments = ArrayList<IndexTextView>()
+    private val labels = ArrayList<IndexTextView>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,11 +29,19 @@ class GameActivity : AppCompatActivity() {
         val game = intent.getSerializableExtra("game") as Game
 
         buildGameLayout(game)
+        for((index, cat) in game.items.withIndex()){
+            for((item) in cat.withIndex()){
+                game.items[index][item]="Purple Pony"
+            }
+        }
+
+        updateBoxImages(game)
+        updateComments(game)
+        updateLabels(game)
 
         if (game.numPlayers == 1) findViewById<Button>(R.id.game_btn).visibility = View.INVISIBLE
-        else buildQuestionDialog(game)
+        else {buildQuestionDialog(game); inputPlayerNames(game)}
 
-        inputPlayerNames(game)
         save(game)
         val test = load()
         if(test != null){
@@ -62,42 +71,59 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun buildGameLayout(game: Game) {
+        //add the check-box container arrays for each player
         for(player in 0 until game.numPlayers){
             playerBoxes.add(ArrayList())
         }
+        //The views are inflated in a loop and then added to the rows array then after they have all been inflated they are added to main game layout
         val rows = ArrayList<View>()
-        val gameLayout =
-            findViewById<LinearLayout>(R.id.game_layout) //The layout where the game view will be displayed.
-        var maxWidth =
-            0 //the max width of the item labels. Used to make all the item TextViews the same size as the longest label.
+        val gameLayout = findViewById<LinearLayout>(R.id.game_layout)
+
+        //the max width of the item labels. Used to make all the item TextViews the same size as the longest label.
+        var maxWidth = 0
+
         var itemIndex = 0
-        for ((catIndex, category) in game.categories.withIndex()) { //For each category build the title row and then all the items rows for that category and add to the rows array list.
+        //For each category in the game (Suspects, Weapons and Rooms).
+        for ((catIndex, category) in game.categories.withIndex()) {
             val titleRow = LayoutInflater.from(this).inflate(R.layout.title_row, gameLayout, false)
             val title = titleRow.findViewById<TextView>(R.id.title)
+
+            //Set onClickListener to change the text
+            title.isSingleLine = true
             title.isClickable = true
             title.setOnClickListener { changeItemName(title) }
             title.text = category
+
             rows.add(titleRow)
+            val indexTitle = IndexTextView(title, -1*(catIndex+1))
+            labels.add(indexTitle)
+
+            //For each item in the category
             for (item in game.items[catIndex]) {
-                val itemRow =
-                    LayoutInflater.from(this).inflate(R.layout.item_row, gameLayout, false)
+                val itemRow = LayoutInflater.from(this).inflate(R.layout.item_row, gameLayout, false)
 
                 val comment = itemRow.findViewById<TextView>(R.id.comment)
                 comment.isSingleLine = true
+                comment.isClickable = true
                 comment.setOnClickListener { addComment(comment) }
+                val indexComment = IndexTextView(comment,itemIndex)
+                comments.add(indexComment)
 
                 val label = itemRow.findViewById<TextView>(R.id.label)
-                label.text = item
-                label.measure(0, 0)
+                label.isSingleLine = true
                 label.isClickable = true
                 label.setOnClickListener { changeItemName(label) }
+                label.text = item
+                label.measure(0, 0)
                 maxWidth = max(label.measuredWidth, maxWidth)
+                val indexLabel = IndexTextView(label,itemIndex)
+                labels.add(indexLabel)
 
                 val boxesLayout = itemRow.findViewById<LinearLayout>(R.id.boxes_layout)
                 for (player in 0 until game.numPlayers) { //add a checkbox for each player
 
                     val image = ImageView(this)
-                    val box = Box(image,itemIndex)
+                    val box = IndexImage(image,itemIndex)
                     val params = LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
@@ -119,7 +145,6 @@ class GameActivity : AppCompatActivity() {
                 label.width = maxWidth
             }
             gameLayout.addView(row)
-            updateBoxImages(game)
         }
     }
 
@@ -258,26 +283,58 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-    private fun clickBox(game: Game, box: Box){
-        game.toggleMainPlayerRowState(box.itemIndex)
+    private fun clickBox(game: Game, indexImage: IndexImage){
+        game.toggleMainPlayerRowState(indexImage.index)
         for((playerIndex, player) in playerBoxes.withIndex()){
-            when(game.playerStates[playerIndex][box.itemIndex]){
-                0 -> player[box.itemIndex].imageView.setImageResource(R.drawable.ic_nobox)
-                1 -> player[box.itemIndex].imageView.setImageResource(R.drawable.ic_yesbox)
-                else -> player[box.itemIndex].imageView.setImageResource(R.drawable.ic_unsurebox)
-            }
+            setBoxImage(game, player, playerIndex, indexImage.index)
         }
     }
 
     private fun updateBoxImages(game: Game){
+        //For each player in the game
         for((playerIndex,player) in playerBoxes.withIndex()){
+            //For each item of that player
             for((itemIndex) in player.withIndex()){
-                when(game.playerStates[playerIndex][itemIndex]){
-                    0 -> player[itemIndex].imageView.setImageResource(R.drawable.ic_nobox)
-                    1 -> player[itemIndex].imageView.setImageResource(R.drawable.ic_yesbox)
-                    else -> player[itemIndex].imageView.setImageResource(R.drawable.ic_unsurebox)
-                }
+                //Set the image based on the state of that item
+                setBoxImage(game, player, playerIndex, itemIndex)
             }
+        }
+    }
+
+    private fun updateLabels(game: Game){
+        //Todo: This seems pretty dirty, think of a neater way to do this
+        //Todo: Do I really need the indexed item class? Isn't an ArrayList exactly the same?
+        //Todo: I would need a categories ArrayList as well as a labels one
+        val flatItems = ArrayList<String>()
+        for(cat in game.items){
+            for(item in cat){
+                flatItems.add(item)
+            }
+        }
+
+        for(label in labels){
+            //if a category label
+            if(label.index<0){
+                label.text.text = game.categories[-1*(label.index+1)]
+            }
+            //else it's an item label
+            else{
+                label.text.text = flatItems[label.index]
+            }
+        }
+    }
+
+    private fun updateComments(game: Game){
+        for(comment in comments){
+            comment.text.text = game.playerComments[comment.index]
+        }
+    }
+
+    private fun setBoxImage(game: Game, player: ArrayList<IndexImage>, playerIndex: Int, itemIndex: Int){
+        when(game.playerStates[playerIndex][itemIndex]){
+            0 -> player[itemIndex].image.setImageResource(R.drawable.ic_nobox)
+            1 -> player[itemIndex].image.setImageResource(R.drawable.ic_yesbox)
+            else -> player[itemIndex].image.setImageResource(R.drawable.ic_unsurebox)
         }
     }
 
@@ -308,7 +365,5 @@ class GameActivity : AppCompatActivity() {
         }
         return(null)
     }
-
-    private data class Box(val imageView: ImageView, val itemIndex: Int)
 
 }

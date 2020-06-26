@@ -10,6 +10,7 @@ class Game (num: Int, resources: Resources):Serializable {
     val items = ArrayList<Array<String>>()
     val playerNames = ArrayList<String>()
     val playerStates = ArrayList<ArrayList<Int>>()
+    val playerComments = ArrayList<String>()
     private val questions = ArrayList<Question>()
 
     //player state variables
@@ -43,6 +44,7 @@ class Game (num: Int, resources: Resources):Serializable {
                 for(item in cat){
                     if(player==0){
                         temp.add(no)
+                        playerComments.add("")
                     }else{
                         temp.add(unsure)
                     }
@@ -123,5 +125,5 @@ class Game (num: Int, resources: Resources):Serializable {
         playerStates[0][item]=mainState
     }
 
-    private data class Question (val asker: Int, val answerer: Int, val items: ArrayList<Int>, var ans:Int):Serializable
+
 }
