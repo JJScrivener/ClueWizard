@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/save"
+        android:title="@string/save" />
+    <item android:id="@+id/load"
+        android:title="@string/load" />
+    <item android:id="@+id/edit_questions"
+        android:title="@string/edit_questions" />
+    <item android:id="@+id/properties"
+        android:title="@string/properties" />
+    <item android:id="@+id/about"
+        android:title="@string/about" />
+</menu>

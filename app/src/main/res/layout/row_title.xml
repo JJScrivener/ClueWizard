@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/title_space"
-    android:layout_marginLeft="@dimen/row_side_space">
+    android:layout_marginStart="@dimen/row_side_space"
+    android:layout_marginEnd="@dimen/row_side_space">
 
     <TextView
         android:id="@+id/title"
@@ -13,4 +14,11 @@
         android:layout_weight="1"
         android:textColor="@color/title_text"
         android:textSize="@dimen/title_text"/>
+
+    <ImageView
+        android:id="@+id/menu_button"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/menu_button_margins"/>
+
 </LinearLayout>

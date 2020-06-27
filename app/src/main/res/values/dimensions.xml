@@ -8,4 +8,5 @@
     <dimen name="title_space">10dp</dimen>
     <dimen name="title_text">20sp</dimen>
     <dimen name="comment_padding">4dp</dimen>
+    <dimen name="menu_button_margins">5dp</dimen>
 </resources>

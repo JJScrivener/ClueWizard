@@ -52,5 +52,11 @@
     <string name="question_weapon">What was the weapon?</string>
     <string name="question_room">Which room was it in?</string>
 
+    <!--Popup menu items-->
+    <string name="save">Save</string>
+    <string name="load">Load</string>
+    <string name="edit_questions">Edit Questions</string>
+    <string name="properties">Properties</string>
+    <string name="about">About</string>
 
 </resources>

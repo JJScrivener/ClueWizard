@@ -2,10 +2,7 @@ package scrivener.cluewizard
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import java.io.*
@@ -15,8 +12,12 @@ import java.lang.Integer.max
 //Todo: Change all hard coded strings to resources!
 //Todo: Set up different languages (different countries have different names for the characters)
 //Todo: Have a config activity to create custom profiles with names for all the items and colours etc.
-//Todo: Add a dialog to input how many cards each player has
-class GameActivity : AppCompatActivity() {
+//Todo: Add a dialog to input how many cards each player has.
+//Todo: Look into image buttons and potentially replace the image views with image buttons.
+//Todo: Swipe across to make the comments take up the space where the boxes are and then swip back to make it normal again.
+
+//Todo: FIX THE LAUNCH ICON!!!!!
+class GameActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener{
 
     private val playerBoxes = ArrayList<ArrayList<IndexImage>>()
     private val comments = ArrayList<IndexTextView>()
@@ -85,7 +86,7 @@ class GameActivity : AppCompatActivity() {
         var itemIndex = 0
         //For each category in the game (Suspects, Weapons and Rooms).
         for ((catIndex, category) in game.categories.withIndex()) {
-            val titleRow = LayoutInflater.from(this).inflate(R.layout.title_row, gameLayout, false)
+            val titleRow = LayoutInflater.from(this).inflate(R.layout.row_title, gameLayout, false)
             val title = titleRow.findViewById<TextView>(R.id.title)
 
             //Set onClickListener to change the text
@@ -94,13 +95,21 @@ class GameActivity : AppCompatActivity() {
             title.setOnClickListener { changeItemName(title) }
             title.text = category
 
+            //for the first category add a menu button
+            if(catIndex==0){
+                val menuButton = titleRow.findViewById<ImageView>(R.id.menu_button)
+                menuButton.setImageResource(R.drawable.ic_menu_light)
+                menuButton.isClickable=true
+                menuButton.setOnClickListener { showMenu(menuButton) }
+            }
+
             rows.add(titleRow)
             val indexTitle = IndexTextView(title, -1*(catIndex+1))
             labels.add(indexTitle)
 
             //For each item in the category
             for (item in game.items[catIndex]) {
-                val itemRow = LayoutInflater.from(this).inflate(R.layout.item_row, gameLayout, false)
+                val itemRow = LayoutInflater.from(this).inflate(R.layout.row_item, gameLayout, false)
 
                 val comment = itemRow.findViewById<TextView>(R.id.comment)
                 comment.isSingleLine = true
@@ -189,7 +198,7 @@ class GameActivity : AppCompatActivity() {
         val gameBtn = findViewById<Button>(R.id.game_btn)
 
         val layout = LayoutInflater.from(this)
-            .inflate(R.layout.question, findViewById(R.id.activity_game), false)
+            .inflate(R.layout.dialog_question, findViewById(R.id.activity_game), false)
 
         val playerAdapter: ArrayAdapter<String> =
             ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, game.playerNames)
@@ -337,6 +346,56 @@ class GameActivity : AppCompatActivity() {
             else -> player[itemIndex].image.setImageResource(R.drawable.ic_unsurebox)
         }
     }
+
+    private fun showMenu(v: View) {
+        PopupMenu(this, v).apply {
+            setOnMenuItemClickListener(this@GameActivity)
+            inflate(R.menu.actions)
+            show()
+        }
+    }
+
+    override fun onMenuItemClick(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.save -> {
+                val text = "You pressed Save. Good for you! Unfortunately that feature isn't ready yet so you better hope the app doesn't crash because you'll lose all your progress."
+                val duration = Toast.LENGTH_LONG
+                val toast = Toast.makeText(applicationContext, text, duration)
+                toast.show()
+                true
+            }
+            R.id.load -> {
+                val text = "You pressed Load. I'm so happy for you! Unfortunately that feature isn't ready yet so you'll just have to keep playing this game."
+                val duration = Toast.LENGTH_LONG
+                val toast = Toast.makeText(applicationContext, text, duration)
+                toast.show()
+                true
+            }
+            R.id.edit_questions -> {
+                val text = "You pressed Edit Questions. I hope you didn't enter a question wrong because unfortunately that feature isn't ready yet."
+                val duration = Toast.LENGTH_LONG
+                val toast = Toast.makeText(applicationContext, text, duration)
+                toast.show()
+                true
+            }
+            R.id.properties -> {
+                val text = "You pressed Properties. I guess you want to change them! Unfortunately that feature isn't ready yet but luckily the app is perfect so you actually don't have to change anything."
+                val duration = Toast.LENGTH_LONG
+                val toast = Toast.makeText(applicationContext, text, duration)
+                toast.show()
+                true
+            }
+            R.id.about -> {
+                val text = "You pressed About. I'm glad you're interested in the app! Unfortunately that feature isn't ready yet so I guess you'll never know about this app."
+                val duration = Toast.LENGTH_LONG
+                val toast = Toast.makeText(applicationContext, text, duration)
+                toast.show()
+                true
+            }
+            else -> false
+        }
+    }
+
 
     private fun save(game: Game) {
         try {
